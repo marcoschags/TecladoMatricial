@@ -1,5 +1,7 @@
 #include "pico/stdlib.h"
 #include <stdio.h>
+#include "hardware/timer.h"
+#include "hardware/pwm.h"
 
 #define LED_BLUE 11  // Pino conectado ao LED azul
 #define LED_GREEN 10 // Pino conectado ao LED verde
