@@ -91,7 +91,24 @@ int main()
                     sleep_ms(500); // Tempo que o buzzer ficará ativo
                     gpio_put(BUZZER, false);
                     break;
+                
+                case '7':  // Acende o LED azul
+                    gpio_put(LED_BLUE, true);
+                    sleep_ms(500);
+                    gpio_put(LED_BLUE, false);
+                    break;
+                case '8': // Aciona o buzzer
+                  gpio_put(BUZZER, true);
+                  sleep_ms(500); // Tempo que o buzzer ficará ativo
+                  gpio_put(BUZZER, false);
+                  break;
 
+                case '9': // Acende o LED vermelho
+                  gpio_put(LED_RED, true);
+                  sleep_ms(500);
+                  gpio_put(LED_RED, false);
+                  break;
+                
                 default:
                     break;
             }
