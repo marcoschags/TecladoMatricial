@@ -1,5 +1,5 @@
 [wokwi]
 
 version = 1
-firmware = "build/TecladoMatricial.uf2"
-elf = "build/TecladoMatricial.elf"
+firmware = "build/ledVerde.uf2"
+elf = "build/ledVerde.elf"
