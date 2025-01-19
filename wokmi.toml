@@ -1,5 +1,0 @@
-[wokwi]
-
-version = 1
-firmware = "build/ledVerde.uf2"
-elf = "build/ledVerde.elf"
