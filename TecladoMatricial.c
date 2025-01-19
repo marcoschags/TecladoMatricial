@@ -1,16 +1,15 @@
 #include "pico/stdlib.h"
 #include <stdio.h>
 
-#define LED_BLUE 11  // Pino conectado ao LED azul
-#define LED_GREEN 10 // Pino conectado ao LED verde
-#define LED_RED 9    // Pino conectado ao LED vermelho
-#define BUZZER 12    // Pino conectado ao buzzer
+#define LED_BLUE 12  // Pino conectado ao LED azul
+#define LED_GREEN 11 // Pino conectado ao LED verde
+#define LED_RED 13    // Pino conectado ao LED vermelho
+#define BUZZER 10   // Pino conectado ao buzzer
 
 const uint8_t colunas[4] = {1, 2, 3, 4}; // Pinos das colunas do teclado matricial
 const uint8_t linhas[4] = {5, 6, 7, 8};  // Pinos das linhas do teclado matricial
 
-const char teclado[4][4] = 
-{
+const char teclado[4][4] = {
     {'1', '2', '3', 'A'}, 
     {'4', '5', '6', 'B'}, 
     {'7', '8', '9', 'C'},
@@ -18,9 +17,10 @@ const char teclado[4][4] =
 };
 
 char leitura_teclado();
+void ligar_azul(char);
+void led_azul_morse(char);
 
-int main() 
-{
+int main() {
     // Inicializa a UART (Serial)
     stdio_init_all();
 
@@ -42,32 +42,27 @@ int main()
     gpio_put(BUZZER, false);
 
     // Configuração dos pinos das colunas como saídas digitais
-    for (int i = 0; i < 4; i++) 
-    {
+    for (int i = 0; i < 4; i++) {
         gpio_init(colunas[i]);
         gpio_set_dir(colunas[i], GPIO_OUT);
         gpio_put(colunas[i], 1); // Inicializa todas as colunas como alto
     }
 
     // Configuração dos pinos das linhas como entradas digitais
-    for (int i = 0; i < 4; i++) 
-    {
+    for (int i = 0; i < 4; i++) {
         gpio_init(linhas[i]);
         gpio_set_dir(linhas[i], GPIO_IN);
         gpio_pull_up(linhas[i]); // Habilita pull-up para as linhas
     }
 
-    while (true) 
-    {
+    while (true) {
         char tecla = leitura_teclado();
 
-        if (tecla != 'n') // Só processa se uma tecla foi pressionada
-        {
+        if (tecla != 'n') {// Só processa se uma tecla foi pressionada
             printf("Tecla pressionada: %c\n", tecla);
 
             // Ações associadas às teclas
-            switch (tecla) 
-            {
+            switch (tecla) {
                 case 'A': // Acende o LED azul
                     gpio_put(LED_BLUE, true);
                     sleep_ms(500);
@@ -80,10 +75,9 @@ int main()
                     gpio_put(LED_GREEN, false);
                     break;
 
-                case 'C': // Acende o LED vermelho
-                    gpio_put(LED_RED, true);
-                    sleep_ms(500);
-                    gpio_put(LED_RED, false);
+                case 'C': // Acende o LED azul
+                    led_azul_morse(tecla);
+                    ligar_azul(tecla);
                     break;
 
                 case 'D': // Aciona o buzzer
@@ -104,31 +98,25 @@ int main()
 }
 
 // Função para ler o teclado matricial
-char leitura_teclado() 
-{
+char leitura_teclado() {
     char numero = 'n'; // Valor padrão para quando nenhuma tecla for pressionada
 
     // Desliga todas as colunas
-    for (int i = 0; i < 4; i++) 
-    {
+    for (int i = 0; i < 4; i++) {
         gpio_put(colunas[i], 1);
     }
 
-    for (int coluna = 0; coluna < 4; coluna++) 
-    {
+    for (int coluna = 0; coluna < 4; coluna++) {
         // Ativa a coluna atual
         gpio_put(colunas[coluna], 0);
 
-        for (int linha = 0; linha < 4; linha++) 
-        {
+        for (int linha = 0; linha < 4; linha++) {
             // Verifica se a linha está ativa
-            if (gpio_get(linhas[linha]) == 0) 
-            {
+            if (gpio_get(linhas[linha]) == 0) {
                 numero = teclado[linha][coluna]; // Mapeia a tecla pressionada
 
                 // Aguarda a tecla ser liberada (debounce)
-                while (gpio_get(linhas[linha]) == 0) 
-                {
+                while (gpio_get(linhas[linha]) == 0) {
                     sleep_ms(10);
                 }
                 break; // Sai do laço após detectar a tecla
@@ -138,11 +126,48 @@ char leitura_teclado()
         // Desativa a coluna atual
         gpio_put(colunas[coluna], 1);
 
-        if (numero != 'n') // Sai do laço de colunas se uma tecla foi detectada
-        {
+        if (numero != 'n') {// Sai do laço de colunas se uma tecla foi detectada
             break;
         }
     }
 
     return numero; // Retorna a tecla pressionada
+}
+
+void ligar_azul(char expected) {
+  if(expected == 'C'){
+    gpio_put(LED_BLUE, true);
+    printf("LED Azul Ligado.");
+    sleep_ms(333);
+    printf(".");
+    sleep_ms(333);
+    printf(".\n");
+    sleep_ms(333);
+    gpio_put(LED_BLUE, false);
+  }
+}
+void led_azul_morse(char expected) {
+  //Flash Azul mostrando a letra C em morse
+  if (expected == 'C'){
+    gpio_put(LED_BLUE, true);
+    printf("-");
+    sleep_ms(800);
+    gpio_put(LED_BLUE, false);
+    sleep_ms(125);
+    gpio_put(LED_BLUE, true);
+    printf(".");
+    sleep_ms(200);
+    gpio_put(LED_BLUE, false);
+    sleep_ms(125);
+    gpio_put(LED_BLUE, true);
+    printf("-");
+    sleep_ms(800);
+    gpio_put(LED_BLUE, false);
+    sleep_ms(125);
+    gpio_put(LED_BLUE, true);
+    printf(".\n");
+    sleep_ms(200);
+    gpio_put(LED_BLUE, false);
+    sleep_ms(250);
+  }
 }
