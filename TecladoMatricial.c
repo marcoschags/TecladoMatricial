@@ -33,6 +33,7 @@
         gpio_set_dir(colunas[i], GPIO_OUT);
         gpio_put(colunas[i], 1); // Inicializa todas as colunas como alto
 
+
 }
 
 // Função para ler o teclado matricial
